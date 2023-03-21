@@ -17,7 +17,10 @@ class MyCard extends StatelessWidget {
       width: width,
       decoration: BoxDecoration(
         boxShadow: [
-          BoxShadow(blurRadius: 3, color: Colors.blue, spreadRadius: 1)
+          BoxShadow(
+              blurRadius: 3,
+              color: Color.fromARGB(255, 23, 70, 223),
+              spreadRadius: 1)
         ],
         borderRadius: BorderRadius.circular(20),
         image: DecorationImage(

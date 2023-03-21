@@ -1,10 +1,14 @@
 import 'dart:ui';
 
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:covid_19/Model/WorldStatsModel.dart';
 import 'package:covid_19/Pages/Countries.dart';
+import 'package:covid_19/Services/apiServices.dart';
 import 'package:covid_19/Widgets/StatisticsCard.dart';
 import 'package:covid_19/Widgets/TemplateCard.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+
 import 'package:flutter/services.dart';
 import 'package:pie_chart/pie_chart.dart';
 
@@ -19,11 +23,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   late final AnimationController _controller =
       AnimationController(vsync: this, duration: Duration(seconds: 3))
         ..repeat();
-  @override
-  void dispose() {
-    super.dispose();
-    _controller.dispose();
-  }
 
   final colorList = <Color>[
     Color(0xff4285F4),
@@ -33,6 +32,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    ApiServices services = ApiServices();
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -49,7 +49,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         elevation: 0.0,
         centerTitle: true,
         systemOverlayStyle:
-            SystemUiOverlayStyle(statusBarColor: Colors.white.withAlpha(200)),
+            SystemUiOverlayStyle(statusBarColor: Colors.transparent),
         title: Text(
           "COVID-19",
           style: TextStyle(
@@ -108,91 +108,121 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             SizedBox(
               height: 20,
             ),
-            Container(
-              height: 180,
-              width: 380,
-              color: Color.fromARGB(255, 246, 242, 242),
-              child: PieChart(
-                chartRadius: MediaQuery.of(context).size.width / 3.2,
-                colorList: colorList,
-                chartType: ChartType.ring,
-                ringStrokeWidth: 24,
-                legendOptions: LegendOptions(
-                  legendPosition: LegendPosition.right,
-                ),
-                animationDuration: Duration(milliseconds: 1200),
-                dataMap: {"Total": 12, "Recovered": 20, "Deaths": 3},
-              ),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Padding(
-              padding: const EdgeInsets.all(2.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                // ignore: prefer_const_literals_to_create_immutables
-                children: [
-                  StatisticsCard(
-                      str: "Total",
-                      color: Color.fromARGB(255, 255, 231, 239),
-                      deepcolor: Colors.pink,
-                      num: "87657"),
-                  StatisticsCard(
-                      str: "Deaths",
-                      color: Color.fromARGB(255, 247, 205, 205),
-                      deepcolor: Colors.red,
-                      num: "1234442")
-                ],
-              ),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Padding(
-              padding: const EdgeInsets.all(2.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                // ignore: prefer_const_literals_to_create_immutables
-                children: [
-                  StatisticsCard(
-                      str: "Recovered",
-                      color: Color.fromARGB(255, 239, 251, 230),
-                      deepcolor: Colors.green,
-                      num: "87657"),
-                  StatisticsCard(
-                      str: "Active",
-                      color: Color.fromARGB(255, 205, 208, 247),
-                      deepcolor: Colors.blue,
-                      num: "35")
-                ],
-              ),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Padding(
-              padding: const EdgeInsets.all(2.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                // ignore: prefer_const_literals_to_create_immutables
-                children: [
-                  StatisticsCard(
-                      str: "Today Deaths",
-                      color: Color.fromARGB(255, 253, 251, 228),
-                      deepcolor: Color.fromARGB(255, 255, 230, 0),
-                      num: "64"),
-                  StatisticsCard(
-                      str: "Today Recovered",
-                      color: Color.fromARGB(255, 216, 249, 252),
-                      deepcolor: Colors.cyan,
-                      num: "34")
-                ],
-              ),
-            ),
-            SizedBox(
-              height: 20,
-            ),
+            FutureBuilder<worldStats>(
+                future: services.fetchWorldStatsRecord(),
+                builder: ((context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    return Column(
+                      children: [
+                        Container(
+                          height: 180,
+                          width: 380,
+                          margin: EdgeInsets.all(2),
+                          decoration: BoxDecoration(
+                              border: Border.all(color: Colors.black),
+                              color: Color.fromARGB(255, 222, 222, 222),
+                              borderRadius: BorderRadius.circular(30)),
+                          child: PieChart(
+                            chartRadius:
+                                MediaQuery.of(context).size.width / 3.2,
+                            colorList: colorList,
+                            chartType: ChartType.ring,
+                            ringStrokeWidth: 24,
+                            chartValuesOptions: ChartValuesOptions(
+                                showChartValuesInPercentage: true),
+                            legendOptions: LegendOptions(
+                              legendPosition: LegendPosition.left,
+                            ),
+                            animationDuration: Duration(milliseconds: 1200),
+                            dataMap: {
+                              "Total":
+                                  double.parse(snapshot.data!.cases.toString()),
+                              "Recovered": double.parse(
+                                  snapshot.data!.recovered.toString()),
+                              "Deaths":
+                                  double.parse(snapshot.data!.deaths.toString())
+                            },
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(2.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            // ignore: prefer_const_literals_to_create_immutables
+                            children: [
+                              StatisticsCard(
+                                  str: "Total",
+                                  color: Color.fromARGB(255, 255, 231, 239),
+                                  deepcolor: Colors.pink,
+                                  num: (snapshot.data!.cases.toString())),
+                              StatisticsCard(
+                                  str: "Deaths",
+                                  color: Color.fromARGB(255, 247, 205, 205),
+                                  deepcolor: Colors.red,
+                                  num: snapshot.data!.deaths.toString())
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(2.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            // ignore: prefer_const_literals_to_create_immutables
+                            children: [
+                              StatisticsCard(
+                                  str: "Recovered",
+                                  color: Color.fromARGB(255, 239, 251, 230),
+                                  deepcolor: Colors.green,
+                                  num: snapshot.data!.recovered.toString()),
+                              StatisticsCard(
+                                  str: "Active",
+                                  color: Color.fromARGB(255, 205, 208, 247),
+                                  deepcolor: Colors.blue,
+                                  num: snapshot.data!.active.toString())
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(2.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            // ignore: prefer_const_literals_to_create_immutables
+                            children: [
+                              StatisticsCard(
+                                  str: "Today Deaths",
+                                  color: Color.fromARGB(255, 253, 251, 228),
+                                  deepcolor: Color.fromARGB(255, 255, 230, 0),
+                                  num: snapshot.data!.todayDeaths.toString()),
+                              StatisticsCard(
+                                  str: "Today Recovered",
+                                  color: Color.fromARGB(255, 216, 249, 252),
+                                  deepcolor: Colors.cyan,
+                                  num: snapshot.data!.todayRecovered.toString())
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                      ],
+                    );
+                  } else {
+                    return SpinKitFadingCircle(
+                      color: Colors.black,
+                      size: 50,
+                      controller: _controller,
+                    );
+                  }
+                })),
             Center(
               child: InkWell(
                 onTap: () {

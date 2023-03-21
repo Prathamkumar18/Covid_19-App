@@ -59,7 +59,7 @@ class _SplashScreenState extends State<SplashScreen>
             ),
           ),
           SizedBox(
-            height: 60,
+            height: 80,
           ),
           Center(
             child: Text(
