@@ -16,10 +16,10 @@ class MyCard extends StatelessWidget {
       height: height,
       width: width,
       decoration: BoxDecoration(
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
-              blurRadius: 3,
-              color: Color.fromARGB(255, 23, 70, 223),
+              blurRadius: 1,
+              color: Color.fromARGB(255, 180, 194, 240),
               spreadRadius: 1)
         ],
         borderRadius: BorderRadius.circular(20),

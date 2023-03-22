@@ -26,12 +26,12 @@ class StatisticsCard extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           Text(
-            "$str",
+            str,
             style: TextStyle(color: deepcolor, fontSize: 20),
           ),
           Center(
             child: Text(
-              "$num",
+              num,
               style: TextStyle(color: deepcolor, fontSize: 20),
             ),
           ),

@@ -14,7 +14,7 @@ class _SplashScreenState extends State<SplashScreen>
   late final AnimationController _controller =
       AnimationController(duration: const Duration(seconds: 2), vsync: this)
         ..repeat(reverse: true);
-
+@override
   void initState() {
     super.initState();
     Timer(
@@ -41,7 +41,7 @@ class _SplashScreenState extends State<SplashScreen>
           Center(
             child: AnimatedBuilder(
               // ignore: sort_child_properties_last
-              child: Container(
+              child: SizedBox(
                 height: 300,
                 width: 300,
                 child: Center(
