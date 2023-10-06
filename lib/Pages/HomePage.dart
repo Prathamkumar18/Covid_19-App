@@ -1,13 +1,10 @@
-import 'dart:async';
 import 'dart:ui';
-
+import 'package:covid_19/Pages/donorslist.dart';
 import 'package:covid_19/Pages/plasma.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:internet_connection_checker/internet_connection_checker.dart';
 import "package:pie_chart/pie_chart.dart";
-
 import 'package:covid_19/Model/WorldStatsModel.dart';
 import 'package:covid_19/Pages/Countries.dart';
 import 'package:covid_19/Services/apiServices.dart';
@@ -31,26 +28,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     Color(0xff1aa260),
     Color(0xffde5246),
   ];
-  var internet;
   void initState() {
     super.initState();
-    final StreamSubscription<InternetConnectionStatus> listener =
-        InternetConnectionChecker().onStatusChange.listen(
-      (InternetConnectionStatus status) {
-        switch (status) {
-          case InternetConnectionStatus.connected:
-            setState(() {
-              internet = 1;
-            });
-            break;
-          case InternetConnectionStatus.disconnected:
-            setState(() {
-              internet = 0;
-            });
-            break;
-        }
-      },
-    );
   }
 
   @override
@@ -75,9 +54,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         systemOverlayStyle:
             SystemUiOverlayStyle(statusBarColor: Colors.transparent),
         title: Text(
-          "COVID-19",
-          style: TextStyle(
-              fontSize: 25, color: Colors.black, fontWeight: FontWeight.bold),
+            "COVID-19",
+            style: TextStyle(
+                fontSize: 25, color: Colors.black, fontWeight: FontWeight.bold),
+          
         ),
       ),
       body: Padding(
@@ -143,170 +123,184 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             SizedBox(
               height: 20,
             ),
-            internet == 1
-                ? FutureBuilder<worldStats>(
-                    future: services.fetchWorldStatsRecord(),
-                    builder: ((context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.done) {
-                        return Column(
-                          children: [
-                            Container(
-                              height: 180,
-                              width: 380,
-                              margin: EdgeInsets.all(2),
-                              decoration: BoxDecoration(
-                                  border:
-                                      Border.all(color: Colors.black, width: 2),
-                                  color: Color.fromARGB(255, 213, 232, 243),
-                                  borderRadius: BorderRadius.circular(30)),
-                              child: PieChart(
-                                chartRadius:
-                                    MediaQuery.of(context).size.width / 3.2,
-                                colorList: colorList,
-                                chartType: ChartType.ring,
-                                ringStrokeWidth: 24,
-                                chartValuesOptions: ChartValuesOptions(
-                                    showChartValuesInPercentage: true),
-                                legendOptions: LegendOptions(
-                                  legendPosition: LegendPosition.left,
-                                ),
-                                animationDuration: Duration(milliseconds: 1200),
-                                dataMap: {
-                                  "Total": double.parse(
-                                      snapshot.data!.cases.toString()),
-                                  "Recovered": double.parse(
-                                      snapshot.data!.recovered.toString()),
-                                  "Deaths": double.parse(
-                                      snapshot.data!.deaths.toString())
-                                },
-                              ),
+            FutureBuilder<worldStats>(
+                future: services.fetchWorldStatsRecord(),
+                builder: ((context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    return Column(
+                      children: [
+                        Container(
+                          height: 180,
+                          width: 380,
+                          margin: EdgeInsets.all(2),
+                          decoration: BoxDecoration(
+                              border: Border.all(color: Colors.black, width: 2),
+                              color: Color.fromARGB(255, 213, 232, 243),
+                              borderRadius: BorderRadius.circular(30)),
+                          child: PieChart(
+                            chartRadius:
+                                MediaQuery.of(context).size.width / 3.2,
+                            colorList: colorList,
+                            chartType: ChartType.ring,
+                            ringStrokeWidth: 24,
+                            chartValuesOptions: ChartValuesOptions(
+                                showChartValuesInPercentage: true),
+                            legendOptions: LegendOptions(
+                              legendPosition: LegendPosition.left,
                             ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(2.0),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                // ignore: prefer_const_literals_to_create_immutables
-                                children: [
-                                  StatisticsCard(
-                                      str: "Total",
-                                      color: Color.fromARGB(255, 255, 231, 239),
-                                      deepcolor: Colors.pink,
-                                      num: (snapshot.data!.cases.toString())),
-                                  StatisticsCard(
-                                      str: "Deaths",
-                                      color: Color.fromARGB(255, 247, 205, 205),
-                                      deepcolor: Colors.red,
-                                      num: snapshot.data!.deaths.toString())
-                                ],
-                              ),
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(2.0),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                // ignore: prefer_const_literals_to_create_immutables
-                                children: [
-                                  StatisticsCard(
-                                      str: "Recovered",
-                                      color: Color.fromARGB(255, 239, 251, 230),
-                                      deepcolor: Colors.green,
-                                      num: snapshot.data!.recovered.toString()),
-                                  StatisticsCard(
-                                      str: "Active",
-                                      color: Color.fromARGB(255, 205, 208, 247),
-                                      deepcolor: Colors.blue,
-                                      num: snapshot.data!.active.toString())
-                                ],
-                              ),
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(2.0),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                // ignore: prefer_const_literals_to_create_immutables
-                                children: [
-                                  StatisticsCard(
-                                      str: "Today Deaths",
-                                      color: Color.fromARGB(255, 253, 251, 228),
-                                      deepcolor:
-                                          Color.fromARGB(255, 167, 150, 0),
-                                      num: snapshot.data!.todayDeaths
-                                          .toString()),
-                                  StatisticsCard(
-                                      str: "Today Recovered",
-                                      color: Color.fromARGB(255, 216, 249, 252),
-                                      deepcolor: Colors.cyan,
-                                      num: snapshot.data!.todayRecovered
-                                          .toString())
-                                ],
-                              ),
-                            ),
-                            SizedBox(
-                              height: 20,
-                            ),
-                          ],
-                        );
-                      } else {
-                        return SpinKitFadingCircle(
-                          color: Colors.black,
-                          size: 50,
-                          controller: _controller,
-                        );
-                      }
-                    }))
-                : Container(
-                    height: 200,
-                    width: 380,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(30),
-                      border: Border.all(color: Colors.black),
-                      image: DecorationImage(
-                          image: AssetImage("Assets/noInternet.png"),
-                          fit: BoxFit.cover),
-                    ),
-                  ),
-            internet == 1
-                ? Center(
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => CountriesPage()));
-                      },
-                      child: Container(
-                        height: 50,
-                        width: 300,
-                        decoration: BoxDecoration(
-                          color: Colors.black12,
-                          border: Border.all(color: Colors.black),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Center(
-                          child: Text(
-                            "Track Countries",
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 25,
-                                fontWeight: FontWeight.bold),
+                            animationDuration: Duration(milliseconds: 1200),
+                            dataMap: {
+                              "Total":
+                                  double.parse(snapshot.data!.cases.toString()),
+                              "Recovered": double.parse(
+                                  snapshot.data!.recovered.toString()),
+                              "Deaths":
+                                  double.parse(snapshot.data!.deaths.toString())
+                            },
                           ),
                         ),
-                      ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(2.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            // ignore: prefer_const_literals_to_create_immutables
+                            children: [
+                              StatisticsCard(
+                                  str: "Total",
+                                  color: Color.fromARGB(255, 255, 231, 239),
+                                  deepcolor: Colors.pink,
+                                  num: (snapshot.data!.cases.toString())),
+                              StatisticsCard(
+                                  str: "Deaths",
+                                  color: Color.fromARGB(255, 247, 205, 205),
+                                  deepcolor: Colors.red,
+                                  num: snapshot.data!.deaths.toString())
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(2.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            // ignore: prefer_const_literals_to_create_immutables
+                            children: [
+                              StatisticsCard(
+                                  str: "Recovered",
+                                  color: Color.fromARGB(255, 239, 251, 230),
+                                  deepcolor: Colors.green,
+                                  num: snapshot.data!.recovered.toString()),
+                              StatisticsCard(
+                                  str: "Active",
+                                  color: Color.fromARGB(255, 205, 208, 247),
+                                  deepcolor: Colors.blue,
+                                  num: snapshot.data!.active.toString())
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(2.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            // ignore: prefer_const_literals_to_create_immutables
+                            children: [
+                              StatisticsCard(
+                                  str: "Today Deaths",
+                                  color: Color.fromARGB(255, 253, 251, 228),
+                                  deepcolor: Color.fromARGB(255, 167, 150, 0),
+                                  num: snapshot.data!.todayDeaths.toString()),
+                              StatisticsCard(
+                                  str: "Today Recovered",
+                                  color: Color.fromARGB(255, 216, 249, 252),
+                                  deepcolor: Colors.cyan,
+                                  num: snapshot.data!.todayRecovered.toString())
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                      ],
+                    );
+                  } else {
+                    return SpinKitFadingCircle(
+                      color: Colors.black,
+                      size: 50,
+                      controller: _controller,
+                    );
+                  }
+                })),
+            Center(
+              child: InkWell(
+                onTap: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => CountriesPage()));
+                },
+                child: Container(
+                  height: 50,
+                  width: 300,
+                  decoration: BoxDecoration(
+                    color: Colors.black12,
+                    border: Border.all(color: Colors.black),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Center(
+                    child: Text(
+                      "Track Countries",
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 25,
+                          fontWeight: FontWeight.bold),
                     ),
-                  )
-                : Container(),
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            Text(" Need Plasma?",
+                style: TextStyle(
+                    color: Colors.redAccent,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 30)),
+            SizedBox(
+              height: 20,
+            ),
+            Center(
+              child: InkWell(
+                onTap: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => DonorsList()));
+                },
+                child: Container(
+                  height: 50,
+                  width: 300,
+                  decoration: BoxDecoration(
+                    color: Colors.redAccent,
+                    border: Border.all(color: Colors.white),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Center(
+                    child: Text(
+                      "Check For Donors",
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 25,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+              ),
+            ),
             SizedBox(
               height: 20,
             ),

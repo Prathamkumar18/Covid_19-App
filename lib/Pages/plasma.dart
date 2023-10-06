@@ -1,4 +1,9 @@
+import 'dart:convert';
+import 'package:covid_19/Pages/HomePage.dart';
+import 'package:covid_19/Services/Utilities/appUrls.dart';
+import 'package:covid_19/Services/Utilities/message.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class Plasma extends StatefulWidget {
   @override
@@ -8,13 +13,43 @@ class Plasma extends StatefulWidget {
 class _PlasmaState extends State<Plasma> {
   final _formKey = GlobalKey<FormState>();
 
-  // Define variables to store user input
   String name = '';
   int age = 0;
   String bloodGroup = '';
   String address = '';
   String email = '';
   String phoneNumber = '';
+
+  Future<void> addDonor() async {
+    final url = Uri.parse(AppUrl.addDonor);
+    try {
+      final response = await http.post(
+        url,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, dynamic>{
+          'name': name,
+          'email': email,
+          'age': age,
+          'bloodGroup': bloodGroup,
+          'address': address,
+          'phoneNumber': phoneNumber
+        }),
+      );
+      if (response.statusCode == 201) {
+        final responseBody = json.decode(response.body);
+        final message = responseBody['message'];
+        showSnackBar(context, message);
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => HomePage()));
+      } else {
+        showSnackBar(context, 'Failed to register!!!');
+      }
+    } catch (error) {
+      showSnackBar(context, 'Error: $error');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -174,7 +209,7 @@ class _PlasmaState extends State<Plasma> {
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
                       _formKey.currentState!.save();
-                      // Now you can process the collected data (e.g., send it to a server or store it locally).
+                      addDonor();
                     }
                   },
                   child: Text(
