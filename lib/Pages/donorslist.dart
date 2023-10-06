@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:covid_19/Model/donor.dart';
 import 'package:covid_19/Services/Utilities/appUrls.dart';
+import 'package:covid_19/Services/Utilities/message.dart';
 import 'package:covid_19/Widgets/donorInfo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -34,6 +35,29 @@ class _DonorsListState extends State<DonorsList> {
       });
     } else {
       throw Exception('Failed to load donors');
+    }
+  }
+
+  Future<void> deleteDonor(String email) async {
+    final url = Uri.parse(AppUrl.blockDonor);
+    final response = await http.delete(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'email': email,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      setState(() {
+        donors.removeWhere((donor) => donor.email == email);
+        showSnackBar(context, 'User Blocked');
+        getAllDonors();
+      });
+    } else {
+      showSnackBar(context, 'Failed to Block');
     }
   }
 
@@ -74,12 +98,16 @@ class _DonorsListState extends State<DonorsList> {
           ),
           for (int i = 0; i < donors.length; i++)
             DonorsInfo(
-                name: donors.elementAt(i).name,
-                age: donors.elementAt(i).age,
-                email: donors.elementAt(i).email,
-                address: donors.elementAt(i).address,
-                bloodGroup: donors.elementAt(i).bloodGroup,
-                phoneNumber: donors.elementAt(i).phoneNumber)
+              name: donors.elementAt(i).name,
+              age: donors.elementAt(i).age,
+              email: donors.elementAt(i).email,
+              address: donors.elementAt(i).address,
+              bloodGroup: donors.elementAt(i).bloodGroup,
+              phoneNumber: donors.elementAt(i).phoneNumber,
+              onBlockPressed: () {
+                deleteDonor(donors.elementAt(i).email);
+              },
+            )
         ]),
       ),
     );

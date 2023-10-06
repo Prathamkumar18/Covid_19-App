@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -8,7 +9,7 @@ class DonorsInfo extends StatelessWidget {
   final String address;
   final String bloodGroup;
   final String phoneNumber;
-
+  final VoidCallback onBlockPressed;
   const DonorsInfo({
     Key? key,
     required this.name,
@@ -17,6 +18,7 @@ class DonorsInfo extends StatelessWidget {
     required this.address,
     required this.bloodGroup,
     required this.phoneNumber,
+    required this.onBlockPressed,
   }) : super(key: key);
 
   @override
@@ -54,16 +56,14 @@ class DonorsInfo extends StatelessWidget {
               ),
               subtitle: Text('Age: $age years'),
               trailing: ElevatedButton(
-                onPressed: () {
-                  // Add your block logic here
-                },
+                onPressed: onBlockPressed,
                 child: Text('Block'),
               ),
             ),
           ),
-          Divider(), // Horizontal divider
+          Divider(),
           Container(
-            height: 40, // Adjust the height as needed
+            height: 40,
             child: ListTile(
               leading: Icon(Icons.email, color: Colors.red),
               title: GestureDetector(
@@ -86,25 +86,25 @@ class DonorsInfo extends StatelessWidget {
               ),
             ),
           ),
-          Divider(), // Horizontal divider
+          Divider(),
           Container(
-            height: 40, // Adjust the height as needed
+            height: 40,
             child: ListTile(
               leading: Icon(Icons.location_on, color: Colors.green),
               title: Text(address),
             ),
           ),
-          Divider(), // Horizontal divider
+          Divider(),
           Container(
-            height: 40, // Adjust the height as needed
+            height: 40,
             child: ListTile(
               leading: Icon(Icons.favorite, color: Colors.red),
               title: Text('Blood Group: $bloodGroup'),
             ),
           ),
-          Divider(), // Horizontal divider
+          Divider(),
           Container(
-            height: 40, // Adjust the height as needed
+            height: 40,
             child: ListTile(
               leading: Icon(Icons.phone, color: Colors.blue),
               title: GestureDetector(

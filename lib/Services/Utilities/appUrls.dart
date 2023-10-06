@@ -6,4 +6,5 @@ class AppUrl {
   static const donor = "$url/donor";
   static const addDonor = "$donor/add-donor";
   static const getAllDonors = "$donor/get-all-donors";
+  static const blockDonor = "$donor/delete-donor";
 }
