@@ -1,16 +1,18 @@
 import 'dart:async';
 import 'dart:ui';
+
+import 'package:covid_19/Pages/plasma.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
+import "package:pie_chart/pie_chart.dart";
+
 import 'package:covid_19/Model/WorldStatsModel.dart';
 import 'package:covid_19/Pages/Countries.dart';
 import 'package:covid_19/Services/apiServices.dart';
 import 'package:covid_19/Widgets/StatisticsCard.dart';
 import 'package:covid_19/Widgets/TemplateCard.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-
-import 'package:flutter/services.dart';
-import 'package:internet_connection_checker/internet_connection_checker.dart';
-import 'package:pie_chart/pie_chart.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -99,6 +101,17 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       height: 180,
                       width: 280,
                       img: "temp1",
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) => Plasma()));
+                      },
+                      child: MyCard(
+                        height: 180,
+                        width: 280,
+                        img: "plasma",
+                      ),
                     ),
                     MyCard(
                       height: 180,
