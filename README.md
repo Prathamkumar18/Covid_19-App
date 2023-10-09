@@ -1,5 +1,6 @@
 # Covid-19 Tracker App
 
 
-https://user-images.githubusercontent.com/96865753/226998005-490721b6-401e-4de6-9715-9706ee71ec0b.mp4
 
+
+![Covid19](https://github.com/Prathamkumar18/Covid_19-App/assets/96865753/f6fc00a5-281b-40a2-9bff-d88cc8f33aad)
